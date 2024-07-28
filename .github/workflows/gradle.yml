@@ -35,5 +35,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: csvwhitelist-artifacts-${{ steps.ref.outputs.branch }}
+          name: excelwhitelist-artifacts-${{ steps.ref.outputs.branch }}
           path: build/libs/*.jar

@@ -1,7 +1,10 @@
-package uf.pcbuilding.csvtowhitelist;
+package uf.pcbuilding.exceltowhitelist;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -12,8 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 public class MainCommand implements CommandExecutor {
@@ -31,18 +33,36 @@ public class MainCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         String fileName = config.getString("fileName");
 
-        CSVReader reader;
-
+        FileInputStream file;
+        Workbook workbook;
         try {
-            reader = new CSVReaderBuilder(new FileReader(dataFolder.getAbsoluteFile() + "/" + fileName)).build();
-        } catch (FileNotFoundException e) {
+            file = new FileInputStream(new File(dataFolder.getAbsoluteFile() + "/" + fileName));
+            workbook = new XSSFWorkbook(file);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        for (String[] entry : reader) {
-            String username = entry[10];
+        int index = -1;
+        Sheet sheet = workbook.getSheetAt(0);
 
-            if (username.equals("Minecraft Username")) {
+        Row firstRow = sheet.getRow(0);
+        for (int i = 1; i < firstRow.getLastCellNum(); i++) {
+            Cell cell = firstRow.getCell(i);
+            if (cell.getStringCellValue().equalsIgnoreCase("Minecraft Username")) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1) {
+            throw new RuntimeException("No entry for Minecraft usernames!");
+        }
+
+        for (Row row : sheet) {
+            Cell cell = row.getCell(index);
+            String username = cell.getStringCellValue();
+
+            if (username.equalsIgnoreCase("Minecraft Username")) {
                 continue;
             }
 
@@ -68,12 +88,12 @@ public class MainCommand implements CommandExecutor {
         }
 
         try {
-            reader.close();
+            workbook.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        sender.sendPlainMessage("Parsed CSV! Whitelisted users will be added in the background.");
+        sender.sendPlainMessage("Parsed Excel sheet! Whitelisted users will be added in the background.");
         return true;
     }
 }

@@ -1,4 +1,4 @@
-package uf.pcbuilding.csvtowhitelist;
+package uf.pcbuilding.exceltowhitelist;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

@@ -1,2 +1,2 @@
-rootProject.name = "csvToWhitelist"
+rootProject.name = "ExcelToWhitelist"
 

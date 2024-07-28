@@ -1,16 +1,16 @@
-name: csvToWhitelist
+name: ExcelToWhitelist
 version: '1.0-SNAPSHOT'
-main: uf.pcbuilding.csvtowhitelist.CsvToWhitelist
+main: uf.pcbuilding.exceltowhitelist.ExcelToWhitelist
 api-version: '1.21'
 
 permissions:
-  csvtowhitelist:
-    description: "Allows the ability to run /csv-to-whitelist"
+  exceltowhitelist.command:
+    description: "Allows the ability to run /excel-to-whitelist"
     default: op
 
 commands:
-  csv-to-whitelist:
-    description: "Takes in the provided CSV and adds new users to the whitelist."
-    usage: "/csv-to-whitelist"
-    permission: csvtowhitelist
+  excel-to-whitelist:
+    description: "Takes in the provided Excel sheet and adds new users to the whitelist."
+    usage: "/excel-to-whitelist"
+    permission: exceltowhitelist.command
     permission-message: "You do not have permission to use this command!"

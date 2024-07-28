@@ -31,6 +31,7 @@ public class MainCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         String fileName = config.getString("fileName");
+        String columnTitle = config.getString("columnTitle");
 
         FileInputStream file;
         ReadableWorkbook workbook;
@@ -52,7 +53,7 @@ public class MainCommand implements CommandExecutor {
         Row firstRow = rows.getFirst();
         for (int i = 0; i < firstRow.getCellCount(); i++) {
             Cell cell = firstRow.getCell(i);
-            if (cell.getRawValue().equalsIgnoreCase("Minecraft Username")) {
+            if (cell.getRawValue().equalsIgnoreCase(columnTitle)) {
                 index = i;
                 break;
             }
@@ -64,13 +65,13 @@ public class MainCommand implements CommandExecutor {
 
         for (Row row : rows) {
             Cell cell = row.getCell(index);
-            String username = cell.getRawValue();
+            String username = cell.getRawValue().strip();
 
-            if (username.equalsIgnoreCase("Minecraft Username")) {
+            if (username.equalsIgnoreCase(columnTitle)) {
                 continue;
             }
 
-            UsernameToUUID.getUUID(username.strip(), (uuid -> {
+            UsernameToUUID.getUUID(username, (uuid -> {
                 if (uuid == null) {
                     sender.getServer().getLogger().warning("Could not whitelist " + username + " - invalid username");
                     return;

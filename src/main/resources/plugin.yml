@@ -1,0 +1,16 @@
+name: csvToWhitelist
+version: '1.0-SNAPSHOT'
+main: uf.pcbuilding.csvtowhitelist.CsvToWhitelist
+api-version: '1.21'
+
+permissions:
+  csvtowhitelist:
+    description: "Allows the ability to run /csv-to-whitelist"
+    default: op
+
+commands:
+  csv-to-whitelist:
+    description: "Takes in the provided CSV and adds new users to the whitelist."
+    usage: "/csv-to-whitelist"
+    permission: csvtowhitelist
+    permission-message: "You do not have permission to use this command!"

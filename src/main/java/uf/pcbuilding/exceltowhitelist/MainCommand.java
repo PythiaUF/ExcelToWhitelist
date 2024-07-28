@@ -1,10 +1,5 @@
 package uf.pcbuilding.exceltowhitelist;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -12,11 +7,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.dhatim.fastexcel.reader.Cell;
+import org.dhatim.fastexcel.reader.ReadableWorkbook;
+import org.dhatim.fastexcel.reader.Row;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class MainCommand implements CommandExecutor {
     public JavaPlugin plugin;
@@ -34,21 +33,26 @@ public class MainCommand implements CommandExecutor {
         String fileName = config.getString("fileName");
 
         FileInputStream file;
-        Workbook workbook;
+        ReadableWorkbook workbook;
         try {
             file = new FileInputStream(new File(dataFolder.getAbsoluteFile() + "/" + fileName));
-            workbook = new XSSFWorkbook(file);
+            workbook = new ReadableWorkbook(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         int index = -1;
-        Sheet sheet = workbook.getSheetAt(0);
+        List<Row> rows;
+        try {
+            rows = workbook.getFirstSheet().read();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        Row firstRow = sheet.getRow(0);
-        for (int i = 1; i < firstRow.getLastCellNum(); i++) {
+        Row firstRow = rows.getFirst();
+        for (int i = 0; i < firstRow.getCellCount(); i++) {
             Cell cell = firstRow.getCell(i);
-            if (cell.getStringCellValue().equalsIgnoreCase("Minecraft Username")) {
+            if (cell.getRawValue().equalsIgnoreCase("Minecraft Username")) {
                 index = i;
                 break;
             }
@@ -58,9 +62,9 @@ public class MainCommand implements CommandExecutor {
             throw new RuntimeException("No entry for Minecraft usernames!");
         }
 
-        for (Row row : sheet) {
+        for (Row row : rows) {
             Cell cell = row.getCell(index);
-            String username = cell.getStringCellValue();
+            String username = cell.getRawValue();
 
             if (username.equalsIgnoreCase("Minecraft Username")) {
                 continue;
@@ -81,7 +85,7 @@ public class MainCommand implements CommandExecutor {
                         player.setWhitelisted(true);
                         sender.getServer().getLogger().info("Whitelisted " + username);
                     } catch (IllegalArgumentException e) {
-                        sender.getServer().getLogger().warning("Could not whitelist " + username);
+                        sender.getServer().getLogger().warning("Error when whitelisting " + username);
                     }
                 });
             }));

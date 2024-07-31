@@ -53,7 +53,7 @@ public class MainCommand implements CommandExecutor {
         Row firstRow = rows.getFirst();
         for (int i = 0; i < firstRow.getCellCount(); i++) {
             Cell cell = firstRow.getCell(i);
-            if (cell.getRawValue().equalsIgnoreCase(columnTitle)) {
+            if (cell.getRawValue().toLowerCase().startsWith(columnTitle.toLowerCase())) {
                 index = i;
                 break;
             }
@@ -63,11 +63,14 @@ public class MainCommand implements CommandExecutor {
             throw new RuntimeException("No entry for Minecraft usernames!");
         }
 
+        boolean isFirstRow = true;
+
         for (Row row : rows) {
             Cell cell = row.getCell(index);
             String username = cell.getRawValue().strip();
 
-            if (username.equalsIgnoreCase(columnTitle)) {
+            if (isFirstRow) {
+                isFirstRow = false;
                 continue;
             }
 
